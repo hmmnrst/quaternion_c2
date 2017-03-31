@@ -5,7 +5,7 @@
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'quaternion_c2', :git => 'git://github.com/hmmnrst/quaternion_c2.git'
+gem 'quaternion_c2'
 ```
 
 And then execute:
