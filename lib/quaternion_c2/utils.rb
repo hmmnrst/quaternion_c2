@@ -6,49 +6,57 @@ require_relative 'conversion'
 
 class Quaternion
 	def **(index)
-		if index.kind_of?(Numeric)
-			if __exact_zero__(index)
-				return __new__(1, 0)
-			end
+		unless index.kind_of?(Numeric)
+			num1, num2 = index.coerce(self)
+			return num1 ** num2
+		end
 
-			# complex -> real
+		if __exact_zero__(index)
+			return __new__(1, 0)
+		end
+
+		# complex -> real
+		# (only if the imaginary part is exactly zero)
+		unless index.real?
 			begin
 				index.to_f
 			rescue
 			else
 				index = index.real
 			end
-
-			# rational -> integer
-			if index.kind_of?(Rational) && index.denominator == 1
-				index = index.numerator
-			end
-
-			if index.integer?
-				# binary method
-				x = (index >= 0) ? self : 1 / self
-				n = index.abs
-
-				z = __new__(1, 0)
-				while true
-					n, i = n.divmod(2)
-					z *= x if i == 1
-					return z if n == 0
-					x *= x
-				end
-			elsif index.real?
-				r, theta, vector = polar
-				return Quaternion.polar(r ** index, theta * index, vector)
-			elsif index.complex? || index.kind_of?(Quaternion)
-				r, theta, vector = polar
-				q = Math.log(r) + Quaternion.hrect(0, *(theta * vector))
-				q *= index
-				return Quaternion.polar(Math.exp(q.real), 1, q.imag)
-			end
 		end
 
-		num1, num2 = other.coerce(self)
-		num1 ** num2
+		# rational -> integer
+		if index.kind_of?(Rational) && index.denominator == 1
+			index = index.numerator
+		end
+
+		# calc and return
+		if index.integer?
+			# exponentiation by squaring
+			x = (index >= 0) ? self : __reciprocal__
+			n = index.abs
+
+			z = __new__(1, 0)
+			while true
+				z *= x if n.odd?
+				n >>= 1
+				return z if n.zero?
+				x *= x
+			end
+		elsif index.real?
+			r, theta, vector = polar
+			Quaternion.polar(r ** index, theta * index, vector)
+		elsif index.complex? || index.kind_of?(Quaternion)
+			# assume that log(self) commutes with index under multiplication
+			r, theta, vector = polar
+			q = Quaternion.hrect(Math.log(r), *(theta * vector))
+			q *= index
+			Quaternion.polar(Math.exp(q.real), 1, q.imag)
+		else
+			num1, num2 = index.coerce(self)
+			num1 ** num2
+		end
 	end
 
 	def denominator

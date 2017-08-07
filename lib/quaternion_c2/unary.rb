@@ -40,4 +40,9 @@ class Quaternion
 	else
 		false
 	end
+
+	def __reciprocal__
+		d2 = abs2
+		__new__(@a.conj.quo(d2), @b.quo(-d2))
+	end
 end
