@@ -1,5 +1,22 @@
 # Quaternion
 
+This gem provides a `Quaternion` class highly compatible with other numeric classes.
+
+The [quaternions](https://en.wikipedia.org/wiki/Quaternion) are an extension of complex numbers.
+They have an important application to calculations of spatial rotations, such as in 3DCG.
+
+A quaternion can be represented in several forms:
+
+* Four real numbers: `$w + xi + yj + zk$`
+* Two complex numbers: `$a + bj$`
+* Scalar and 3-D vector: `$s + \vec{v}$`
+* Polar form: `$r \exp{(\vec{n} \theta)}$`
+
+where i, j, and k are imaginary units which satisfy $i^2 = j^2 = k^2 = ijk = -1$.
+A scalar is a real quaternion and a vector is a pure imaginary quaternion.
+
+The multiplication of quaternions is noncommutative unlike complex numbers.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -43,6 +60,32 @@ Complex::I.to_q     #=> (0+1i+0j+0k)
 Complex::I * Quaternion::J  #=> (0+0i+0j+1k)
 1 / Quaternion::I           #=> ((0/1)-(1/1)*i+(0/0)*j+(0/0)*k)
 Quaternion(1, 1, 1, 1) ** 6 #=> (64+0i+0j+0k)
+```
+
+### Spatial rotations
+
+Unit quaternions are often used to calculate 3-D rotations around arbitrary axes.
+They have a compact form, avoid gimbal lock, and easily interpolate between themselves (see [Slerp](https://en.wikipedia.org/wiki/Slerp)).
+
+```ruby
+# theta = 120 * (Math::PI / 180)
+# axis = Vector[1, 1, 1].normalize
+# q = Quaternion.polar(1, theta / 2, axis)
+q = Quaternion(0.5, 0.5, 0.5, 0.5)
+r = Quaternion('2i+3j+4k')
+
+r_new = q * r / q      #=> (0.0+4.0i+2.0j+3.0k)
+r_new = q * r * q.conj #=> (0.0+4.0i+2.0j+3.0k) # q.abs must be 1
+```
+
+More generally, a pair of unit quaternions represents a [4-D rotation](https://en.wikipedia.org/wiki/Rotations_in_4-dimensional_Euclidean_space).
+
+```ruby
+ql = Quaternion(0.5,  0.5, -0.5, 0.5)
+qr = Quaternion(0.5, -0.5,  0.5, 0.5)
+r = Quaternion('1+2i+3j+4k')
+
+r_new = ql * r * qr #=> (-4.0-3.0i-2.0j+1.0k)
 ```
 
 ## Development

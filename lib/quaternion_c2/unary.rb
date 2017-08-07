@@ -1,23 +1,47 @@
 require_relative 'base'
 
-#
-# Unary operations
-#
-
 class Quaternion
+	##
+	# Unary operations
+	#
+
 	# defined by Numeric:
 	# * +@ #=> self
 	# * -@ #=> 0 - self
 
+	##
+	# Returns its conjugate.
+	#
+	# @return [Quaternion]
+	#
+	# @example
+	#   Quaternion(1, 2, 3, 4).conj #=> (1-2i-3j-4k)
+	#
 	def conj
 		__new__(@a.conj, -@b)
 	end
 	alias conjugate conj
 
+	##
+	# Returns square of the absolute value.
+	#
+	# @return [Real]
+	#
+	# @example
+	#   Quaternion(-1, 1, -1, 1).abs2 #=> 4
+	#
 	def abs2
 		@a.abs2 + @b.abs2
 	end
 
+	##
+	# Returns the absolute part of its polar form.
+	#
+	# @return [Real]
+	#
+	# @example
+	#   Quaternion(-1, 1, -1, 1).abs #=> 2.0
+	#
 	def abs
 		a_abs = @a.abs
 		b_abs = @b.abs

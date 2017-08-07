@@ -5,6 +5,17 @@ require_relative 'arithmetic'
 require_relative 'conversion'
 
 class Quaternion
+	##
+	# Performs exponentiation.
+	#
+	# @param index [Numeric]
+	# @return [Quaternion]
+	#
+	# @example
+	#   Quaternion(1, 1, 1, 1) ** 6 #=> (64+0i+0j+0k)
+	#   Math::E.to_q ** Quaternion(Math.log(2), [Math::PI/3 / Math.sqrt(3)] * 3)
+	#   #=> (1.0000000000000002+1.0i+1.0j+1.0k)
+	#
 	def **(index)
 		if index.kind_of?(Numeric)
 			if __exact_zero__(index)
@@ -51,12 +62,33 @@ class Quaternion
 		num1 ** num2
 	end
 
+	##
+	# Returns the denominator (lcm of all components' denominators).
+	# @see numerator
+	#
+	# @return [Integer]
+	#
 	def denominator
 		ad = @a.denominator
 		bd = @b.denominator
 		ad.lcm(bd)
 	end
 
+	##
+	# Returns the numerator.
+	#
+	#   1   1    1    3     4-6i-12j+9k <- numerator
+	#   - - -i - -j + -k -> -----------
+	#   3   2    1    4         12      <- denominator
+	#
+	# @return [Quaternion]
+	#
+	# @example
+	#   q = Quaternion('1/3-1/2i-j+3/4k') #=> ((1/3)-(1/2)*i-1j+(3/4)*k)
+	#   n = q.numerator                   #=> (4-6i-12j+9k)
+	#   d = q.denominator                 #=> 12
+	#   n / d == q                        #=> true
+	#
 	def numerator
 		an = @a.numerator
 		bn = @b.numerator

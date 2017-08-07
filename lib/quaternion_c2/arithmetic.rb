@@ -2,12 +2,18 @@ require_relative 'base'
 require_relative 'classification'
 require_relative 'unary'
 
-#
-# Basic arithmetic operators (#+, #-, #*, #/)
-# and related methods
-#
-
 class Quaternion
+	##
+	# Basic arithmetic operators (#+, #-, #*, #/)
+	# and related methods
+	#
+
+	##
+	# Performs addition.
+	#
+	# @param other [Numeric]
+	# @return [Quaternion]
+	#
 	def +(other)
 		if other.kind_of?(Quaternion)
 			__new__(@a + other.a, @b + other.b)
@@ -19,6 +25,12 @@ class Quaternion
 		end
 	end
 
+	##
+	# Performs subtraction.
+	#
+	# @param other [Numeric]
+	# @return [Quaternion]
+	#
 	def -(other)
 		if other.kind_of?(Quaternion)
 			__new__(@a - other.a, @b - other.b)
@@ -30,6 +42,12 @@ class Quaternion
 		end
 	end
 
+	##
+	# Performs multiplication.
+	#
+	# @param other [Numeric]
+	# @return [Quaternion]
+	#
 	def *(other)
 		if other.kind_of?(Quaternion)
 			_a = other.a
@@ -42,6 +60,25 @@ class Quaternion
 			n1 * n2
 		end
 	end
+
+	##
+	# @!method quo(other)
+	#
+	# Performs division.
+	#
+	# @param other [Numeric]
+	# @return [Quaternion]
+	# @raise [ZeroDivisionError] if +other+ is exactly zero.
+	#
+
+	##
+	# @!method fdiv(other)
+	#
+	# Performs division as each part is a float, never returns a float.
+	#
+	# @param other [Numeric]
+	# @return [Quaternion]
+	#
 
 	[:quo, :fdiv].each do |sym|
 		define_method(sym) do |other|
@@ -58,10 +95,17 @@ class Quaternion
 	alias / quo
 	undef div, %, modulo, remainder, divmod
 
-	#
+	##
 	# Conversion
 	#
 
+	##
+	# Performs type conversion.
+	#
+	# @param other [Numeric]
+	# @return [[Quaternion, self]]
+	# @raise [TypeError]
+	#
 	def coerce(other)
 		if other.kind_of?(Quaternion)
 			[other, self]

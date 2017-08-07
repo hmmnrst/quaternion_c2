@@ -8,11 +8,22 @@ require_relative 'to_type'
 require 'matrix'
 
 class Quaternion
-	#
+	##
 	# Constructors
 	#
 
 	class << self
+		##
+		# Returns a quaternion object a+bj, where both a and b are complex (or real).
+		#
+		# @param a [Complex]
+		# @param b [Complex]
+		# @return [Quaternion]
+		# @raise [TypeError]
+		#
+		# @example
+		#   Quaternion.rect(1, Complex::I) #=> (1+0i+0j+1k)
+		#
 		def rect(a, b = 0)
 			unless [a, b].all? { |c| c.kind_of?(Numeric) && c.complex? }
 				raise TypeError, 'not a complex'
@@ -21,6 +32,19 @@ class Quaternion
 		end
 		alias rectangular rect
 
+		##
+		# Returns a quaternion object w+xi+yj+zk, where all of w, x, y, and z are real.
+		#
+		# @param w [Real]
+		# @param x [Real]
+		# @param y [Real]
+		# @param z [Real]
+		# @return [Quaternion]
+		# @raise [TypeError]
+		#
+		# @example
+		#   Quaternion.hrect(1, 2, 3, 4) #=> (1+2i+3j+4k)
+		#
 		def hrect(w, x = 0, y = 0, z = 0)
 			a = Complex.rect(w, x)
 			b = Complex.rect(y, z)
@@ -28,8 +52,26 @@ class Quaternion
 		end
 		alias hyperrectangular hrect
 
-		# Quaternion.polar(r) == r
-		# Quaternion.polar(r, theta) == Complex.polar(r, theta)
+		##
+		# Returns a quaternion object which denotes the given polar form.
+		# The actual angle is recognized as +theta * vector.norm+.
+		#
+		# @param r      [Real]       absolute value
+		# @param theta  [Real]       angle in radians
+		# @param vector [Enumerable] 3-D vector
+		# @return [Quaternion]
+		# @raise [TypeError]
+		#
+		# @example
+		#   Quaternion.polar(1, Math::PI/3, Vector[1,1,1].normalize)
+		#   #=> (0.5000000000000001+0.5i+0.5j+0.5k)
+		#   Quaternion.polar(1, 1, Math::PI/3 * Vector[1,1,1].normalize)
+		#   #=> (0.4999999999999999+0.5i+0.5j+0.5k)
+		#
+		#   r, theta = -3, -1
+		#   Quaternion.polar(r)        == r                       #=> true
+		#   Quaternion.polar(r, theta) == Complex.polar(r, theta) #=> true
+		#
 		def polar(r, theta = 0, vector = Vector[1, 0, 0])
 			unless vector.kind_of?(Enumerable) && vector.size == 3
 				raise TypeError, 'not a 3-D vector'
@@ -49,25 +91,57 @@ class Quaternion
 		end
 	end
 
-	#
+	##
 	# Accessors
 	#
 
+	##
+	# Returns an array of two complex numbers.
+	#
+	# @return [[Complex, Complex]]
+	#
+	# @example
+	#   Quaternion('1+2i+3j+4k').rect #=> [(1+2i), (3+4i)]
+	#
 	def rect
 		[@a, @b]
 	end
 	alias rectangular rect
 
+	##
+	# Returns an array of four real numbers.
+	#
+	# @return [[Real, Real, Real, Real]]
+	#
+	# @example
+	#   Quaternion('1+2i+3j+4k').hrect #=> [1, 2, 3, 4]
+	#
 	def hrect
 		rect.flat_map(&:rect)
 	end
 	alias hyperrectangular hrect
 
+	##
+	# Returns the real part.
+	#
+	# @return [Real]
+	#
+	# @example
+	#   Quaternion('1+2i+3j+4k').real #=> 1
+	#
 	def real
 		@a.real
 	end
 	alias scalar real
 
+	##
+	# Returns the imaginary part as a 3-D vector.
+	#
+	# @return [Vector] 3-D vector
+	#
+	# @example
+	#   Quaternion('1+2i+3j+4k').imag #=> Vector[2, 3, 4]
+	#
 	def imag
 		Vector[*hrect.drop(1)]
 	end
@@ -78,6 +152,14 @@ class Quaternion
 	# * abs
 	# * magnitude
 
+	##
+	# Returns the angle part of its polar form.
+	#
+	# @return [Real]
+	#
+	# @example
+	#   Quaternion('1+i+j+k').arg #=> Math::PI/3
+	#
 	def arg
 		r_cos = real
 		r_sin = imag.norm
@@ -86,6 +168,14 @@ class Quaternion
 	alias angle arg
 	alias phase arg
 
+	##
+	# Returns the axis part of its polar form.
+	#
+	# @return [Vector] normalized 3-D vector
+	#
+	# @example
+	#   Quaternion('1+i+j+k').axis #=> Vector[1,1,1].normalize
+	#
 	def axis
 		v = imag
 		norm = v.norm
@@ -100,24 +190,55 @@ class Quaternion
 		end
 	end
 
+	##
+	# Returns an array; +[q.abs, q.arg, q.axis]+.
+	#
+	# @return [[Real, Real, Vector]]
+	#
+	# @example
+	#   Quaternion('1+i+j+k').polar
+	#   #=> [2.0, Math::PI/3, Vector[1,1,1].normalize]
+	#
 	def polar
 		[abs, arg, axis]
 	end
 end
 
-#
-# Generic constructor
-#
-# This accepts various arguments:
-# * (Numeric)          -> real quaternion
-# * (Numeric, Numeric) -> a+bj
-# * (Numeric, Vector)  -> scalar and 3-D vector
-# * (Numeric, Numeric, Numeric[, Numeric]) -> w+xi+yj+zk
-# and String instead of Numeric.
-#
 module Kernel
 	module_function
 
+	##
+	# Returns a quaternion.
+	#
+	# This function accepts various arguments except polar form.
+	# Strings are parsed to +Numeric+.
+	#
+	# @overload Quaternion(w, x, y, z)
+	#   @param w [Numeric]
+	#   @param x [Numeric]
+	#   @param y [Numeric]
+	#   @param z [Numeric]
+	#   @return [Quaternion] w+xi+yj+zk
+	# @overload Quaternion(a, b)
+	#   @param a [Numeric]
+	#   @param b [Numeric]
+	#   @return [Quaternion] a+bj
+	# @overload Quaternion(s, v)
+	#   @param s [Numeric]    scalar part
+	#   @param v [Enumerable] vector part
+	#   @return [Quaternion] $s+\\vec!{v}$
+	# @overload Quaternion(str)
+	#   @param str [String]
+	#   @return [Quaternion] +str.to_q+
+	#   @raise [ArgumentError] if its format is inexact.
+	#
+	# @example
+	#   Quaternion(1)            #=> (1+0i+0j+0k)
+	#   Quaternion(1, 2)         #=> (1+0i+2j+0k) # not (1+2i+0j+0k)
+	#   Quaternion(1, 2, 3, 4)   #=> (1+2i+3j+4k)
+	#   Quaternion(1, [2, 3, 4]) #=> (1+2i+3j+4k)
+	#   Quaternion('1+2i+3j+4k') #=> (1+2i+3j+4k)
+	#
 	def Quaternion(*args)
 		argc = args.size
 
