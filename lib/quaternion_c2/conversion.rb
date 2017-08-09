@@ -141,26 +141,45 @@ module Kernel
 		end
 
 		case argc
+		when 1
+			arg = args[0]
+			if arg.kind_of?(Numeric)
+				# a quaternion (or an octonion, etc.)
+				return arg.complex? ? arg.to_q : arg
+			else
+				raise TypeError,
+				      "can't convert #{arg.class} into Quaternion"
+			end
 		when 2
 			if args[1].kind_of?(Enumerable)
-				# scalar and 3-D vector
+				# scalar and 3-D vector -> expand
 				if args[1].size != 3
 					raise TypeError, "not a 3-D vector"
 				end
-				args = [args[0], *args[1]]
-			else
+				args.flatten!(1)
+			elsif args.all? { |x| x.kind_of?(Numeric) && x.complex? }
 				# a pair of complex numbers
+				return Quaternion.send(:new, *args)
+			else
 				return args[0] + args[1] * Quaternion::J
 			end
 		end
 
-		# maximum four real numbers
-		i = Quaternion::I
-		j = Quaternion::J
-		k = Quaternion::K
-		zero = Quaternion.send(:new, 0, 0)
-		args.zip([1, i, j, k]).inject(zero) do |sum,(num,base)|
-			sum + num * base
+		w, x, y, z = args
+		z ||= 0
+		if args.all? { |x| x.kind_of?(Numeric) && x.real? }
+			# 3 or 4 real numbers
+			a = Complex.rect(w, x)
+			b = Complex.rect(y, z)
+			Quaternion.send(:new, a, b)
+		else
+			a = Complex(w, x)
+			b = Complex(y, z)
+			if [a, b].all? { |x| x.kind_of?(Numeric) && x.complex? }
+				Quaternion.send(:new, a, b)
+			else
+				a + b * Quaternion::J
+			end
 		end
 	end
 end
