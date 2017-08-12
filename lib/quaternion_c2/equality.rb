@@ -5,6 +5,12 @@ class Quaternion
 	undef <=>
 	undef_method(*Comparable.instance_methods)
 
+	##
+	# Returns true if it equals to the other numerically.
+	#
+	# @param other [Object]
+	# @return [Boolean]
+	#
 	def ==(other)
 		if other.kind_of?(Quaternion)
 			@a == other.a && @b == other.b
@@ -15,6 +21,12 @@ class Quaternion
 		end
 	end
 
+	##
+	# Returns true if two quaternions have same reals.
+	#
+	# @param other [Object]
+	# @return [Boolean]
+	#
 	def eql?(other)
 		if other.kind_of?(Quaternion)
 			@a.eql?(other.a) && @b.eql?(other.b)
@@ -23,8 +35,13 @@ class Quaternion
 		end
 	end
 
-	# q1.eql?(q2) => q1.hash == q2.hash
+	##
+	# Returns a hash.
+	#
+	# @return [Integer]
+	#
 	def hash
+		# q1.eql?(q2) -> q1.hash == q2.hash
 		[@a, @b].hash
 	end
 end

@@ -9,12 +9,23 @@ class Quaternion
 	defined_methods = public_instance_methods
 
 	if defined_methods.include?(:finite?)
+		##
+		# Returns true if its magnitude is finite, oterwise returns false.
+		#
+		# @return [Boolean]
+		#
 		def finite?
 			abs.finite?
 		end
 	end
 
 	if defined_methods.include?(:infinite?)
+		##
+		# Returns values corresponding to the value of its magnitude.
+		#
+		# @return [nil] if finite.
+		# @return [+1]  if positive infinity.
+		#
 		def infinite?
 			abs.infinite?
 		end
