@@ -65,16 +65,20 @@ class Quaternion
 				|\z
 				(?'head_or_sign' (?<=^|\s) [+-]?+ | [+-])
 				(?'digits'       \d++ (?:#{strict ? "_" : "_++"} \d++)*+)
-				(?'int_or_float' (?:\g'digits')?+ (?:\. \g'digits')?+ (?<=\d) (?:e [+-]?+ \g'digits')?+)
+				(?'int_or_float' (?:\g'digits')?+ (?:\. \g'digits')?+
+				                 (?<=\d) (?:e [+-]?+ \g'digits')?+)
 				(?'rational'     \g'int_or_float' (?:/ \g'digits')?+)
 			}xi
 
-			match_data = regexp.match(str)
-			if strict && (!$'.empty? || match_data.captures[0,4].all?(&:nil?))
-				raise ArgumentError, "invalid value for convert(): #{str.inspect}"
+			# regexp.match(str) always succeeds (even if str is empty)
+			components = regexp.match(str).captures[0,4]
+			components = components.reverse.drop_while(&:nil?).reverse
+			if strict && (!$'.empty? || components.empty?)
+				raise ArgumentError,
+				      "invalid value for convert(): #{str.inspect}"
 			end
 
-			w, x, y, z = match_data.captures[0,4].collect do |s|
+			components.collect! do |s|
 				case s
 				when %r{/}     then s.to_r
 				when %r{[.eE]} then s.to_f
@@ -84,7 +88,18 @@ class Quaternion
 				end
 			end
 
-			new(Complex.rect(w, x), Complex.rect(y, z))
+			# returns the parsed number as a preferred type
+			case components.size
+			when 0
+				0
+			when 1
+				components[0]
+			when 2
+				Complex.rect(*components)
+			else # 3 or 4
+				w, x, y, z = components
+				new(Complex.rect(w, x), Complex.rect(y, z || 0))
+			end
 		end
 	end
 end
@@ -97,7 +112,7 @@ end
 
 class String
 	def to_q
-		Quaternion.send(:parse, self, false)
+		Quaternion.send(:parse, self, false).to_q
 	end
 end
 
