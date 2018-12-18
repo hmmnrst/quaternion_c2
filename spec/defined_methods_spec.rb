@@ -7,8 +7,12 @@ c_all = Complex.public_instance_methods(true)
 c_def = Complex.public_instance_methods(false)
 n_all = Numeric.public_instance_methods(true)
 
+qc_def = Quaternion.methods(false)
+cc_def = Complex.methods(false)
+
 # extra methods for Quaternion
 q_ext = [:axis, :hrect, :hyperrectangular, :scalar, :vector]
+qc_ext = [:hrect, :hyperrectangular]
 
 # optional methods (which may be overridden to improve performance)
 q_opt = [:+@, :-@,            :integer?,     :nonzero?, :to_int,        :zero?]
@@ -46,6 +50,13 @@ RSpec.describe Quaternion do
 			c_undef = n_all - c_all
 			expect(q_undef - c_undef).to contain_exactly(:j)
 			expect(c_undef - q_undef).to contain_exactly()
+		end
+	end
+
+	describe "public class methods" do
+		it "are almost same to those for Complex" do
+			expect(qc_def - cc_def).to contain_exactly(*qc_ext)
+			expect(cc_def - qc_def).to contain_exactly()
 		end
 	end
 end

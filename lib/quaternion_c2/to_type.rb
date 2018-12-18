@@ -121,9 +121,8 @@ class Quaternion
 	end
 
 	class << self
-		##
-		# @!visibility private
-		#
+		private
+
 		def parse(str, strict = false)
 			regexp = %r{
 				\A

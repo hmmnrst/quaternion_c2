@@ -3,6 +3,30 @@ require "quaternion_c2/units"
 require "quaternion_c2/equality" # define #eql?
 
 RSpec.describe Quaternion do
+	let(:c_0) { Complex(0, 0) }
+	let(:c_1) { Complex(1, 0) }
+	let(:c_i) { Complex(0, 1) }
+
+	describe "constants" do
+		it "are 3 imaginary units" do
+			expect(Quaternion.constants).to contain_exactly(*Complex.constants, :J, :K)
+		end
+	end
+
+	describe "::I" do
+		it { expect(Quaternion::I).to eql Quaternion.send(:new, c_i, c_0) }
+	end
+
+	describe "::J" do
+		it { expect(Quaternion::J).to eql Quaternion.send(:new, c_0, c_1) }
+	end
+
+	describe "::K" do
+		it { expect(Quaternion::K).to eql Quaternion.send(:new, c_0, c_i) }
+	end
+end
+
+RSpec.describe Quaternion do
 	let(:num) { Quaternion.send(:new, 0, 0) }
 
 	describe "#i" do
