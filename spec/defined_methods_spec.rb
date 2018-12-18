@@ -19,14 +19,14 @@ q_opt = [:+@, :-@,            :integer?,     :nonzero?, :to_int,        :zero?]
 c_opt = [:+@, :-@, :complex?, :integer?, :j, :nonzero?, :to_int, :to_q, :zero?]
 
 RSpec.describe Quaternion do
-	describe "public methods" do
+	describe "public instance methods" do
 		it "are almost same to those for Complex" do
 			expect(q_all - c_all).to contain_exactly(*q_ext)
 			expect(c_all - q_all).to contain_exactly(:j)
 		end
 	end
 
-	describe "inherited methods" do
+	describe "inherited instance methods" do
 		it "are almost same to those for Complex" do
 			q_inherit = q_all - q_def - q_opt
 			c_inherit = c_all - c_def - c_opt
@@ -35,7 +35,7 @@ RSpec.describe Quaternion do
 		end
 	end
 
-	describe "overridden methods" do
+	describe "overridden instance methods" do
 		it "are almost same to those for Complex" do
 			q_override = n_all & q_def - q_opt
 			c_override = n_all & c_def - c_opt
@@ -44,7 +44,7 @@ RSpec.describe Quaternion do
 		end
 	end
 
-	describe "undefined methods" do
+	describe "undefined instance methods" do
 		it "are almost same to those for Complex" do
 			q_undef = n_all - q_all
 			c_undef = n_all - c_all
