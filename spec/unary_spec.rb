@@ -5,6 +5,14 @@ require "quaternion_c2/equality" # define #eql?
 RSpec.describe Quaternion do
 	let(:num) { Quaternion.send(:new, 0, 0) }
 
+	describe "#-@" do
+		it "returns a negative quaternion" do
+			q  = Quaternion.send(:new, Complex( 1, -2), Complex(-3,  4))
+			qc = Quaternion.send(:new, Complex(-1,  2), Complex( 3, -4))
+			expect(-q).to eql qc
+		end
+	end
+
 	describe "#conj" do
 		it "returns a conjugate quaternion" do
 			q  = Quaternion.send(:new, Complex(1, -2), Complex(-3,  4))
