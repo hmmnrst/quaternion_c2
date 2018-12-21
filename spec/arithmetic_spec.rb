@@ -97,7 +97,7 @@ RSpec.describe Quaternion do
 		context "Quaternion / Complex" do
 			let(:num1) { Quaternion.send(:new, Complex(1, Rational(2, 1)), Complex(3, 4.0)) }
 			let(:num2) { Complex::I }
-			let(:result) { Quaternion.send(:new, Complex(2, -1) / 1, Complex(-4.0, 3.0)) }
+			let(:result) { Quaternion.send(:new, Complex(2, -1) / Complex(1), Complex(-4.0, 3.0)) }
 			include_examples "correct answer"
 		end
 
