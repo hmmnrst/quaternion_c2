@@ -10,6 +10,18 @@ class Quaternion
 	# * -@ #=> 0 - self
 
 	##
+	# Returns negation of the value.
+	#
+	# @return [Quaternion]
+	#
+	# @example
+	#   -Quaternion(1, 2, 3, 4) #=> (-1-2i-3j-4k)
+	#
+	def -@
+		__new__(-@a, -@b)
+	end
+
+	##
 	# Returns its conjugate.
 	#
 	# @return [Quaternion]
