@@ -3,12 +3,12 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "quaternion_c2"
-  spec.version       = "0.1.2"
+  spec.version       = "0.9.0"
   spec.authors       = ["Masahiro Nomoto"]
   spec.email         = ["hmmnrst@users.noreply.github.com"]
 
   spec.summary       = %q{Quaternion class}
-  spec.description   = %q{This provides a numeric class Quaternion which is similar to a built-in class Complex.}
+  spec.description   = %q{Provides a numeric class Quaternion which is similar to a built-in class Complex.}
   spec.homepage      = "https://github.com/hmmnrst/quaternion_c2"
   spec.license       = "MIT"
 
