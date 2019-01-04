@@ -121,11 +121,8 @@ class Quaternion
 	end
 
 	class << self
-		##
-		# @!visibility private
-		#
-		def parse(str, strict = false)
-			regexp = %r{
+		RE, RE_STRICT = [false, true].collect do |strict|
+			%r{
 				\A
 				\s*+
 				(?:(?'real'   [+-]?+           \g'rational'  ) (?![ijk]))?+
@@ -133,13 +130,20 @@ class Quaternion
 				(?:(?'imag_j' \g'head_or_sign' \g'rational'?+) j        )?+
 				(?:(?'imag_k' \g'head_or_sign' \g'rational'?+) k        )?+
 				\s*+
-				|\z
-				(?'head_or_sign' (?<=^|\s) [+-]?+ | [+-])
+				|(?!)
+				(?'head_or_sign' (?<!\S) [+-]?+ | [+-])
 				(?'digits'       \d++ (?:#{strict ? "_" : "_++"} \d++)*+)
 				(?'int_or_float' (?:\g'digits')?+ (?:\. \g'digits')?+
 				                 (?<=\d) (?:e [+-]?+ \g'digits')?+)
 				(?'rational'     \g'int_or_float' (?:/ \g'digits')?+)
 			}xi
+		end
+		private_constant :RE, :RE_STRICT
+
+		private
+
+		def parse(str, strict = false)
+			regexp = strict ? RE_STRICT : RE
 
 			# regexp.match(str) always succeeds (even if str is empty)
 			components = regexp.match(str).captures[0,4]
