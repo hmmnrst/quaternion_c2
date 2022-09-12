@@ -83,7 +83,8 @@ class Quaternion
 	[:quo, :fdiv].each do |sym|
 		define_method(sym) do |other|
 			if other.kind_of?(Quaternion)
-				self * other.conj.send(sym, other.abs2)
+				n = self * other.conj.send(sym, other.abs2)
+				__new__(n.a / 1, n.b / 1) # Canonicalize rationals as Complex does
 			elsif other.kind_of?(Numeric) && other.complex?
 				__new__(@a.send(sym, other), @b.send(sym, other.conj))
 			else
