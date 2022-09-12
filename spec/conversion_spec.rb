@@ -71,6 +71,7 @@ RSpec.describe Quaternion do
 			let(:w) { Complex(1) }
 
 			it "should raise error" do
+				skip if (Complex.rect(Complex.rect(1)) rescue nil) # Ruby >= 2.7
 				expect { Quaternion.hrect(w) }.to raise_error TypeError, /not a real/
 			end
 		end

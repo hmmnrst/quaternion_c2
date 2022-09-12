@@ -2,7 +2,6 @@ require_relative 'base'
 require_relative 'classification'
 
 class Quaternion
-	undef <=>
 	undef_method(*Comparable.instance_methods)
 
 	##
